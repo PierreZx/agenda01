@@ -139,4 +139,7 @@ entry5.bind('<FocusIn>', on_entry_click4)
 entry5.bind('<FocusOut>', on_focusout4)
 entry5.place(x= 30, y= 110)
 
+boot1 = ttk.Button(aba2, text="Adicionar", bootstyle="info")
+boot1.place(x= 30, y= 130)
+
 app.mainloop()
