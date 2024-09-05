@@ -2,7 +2,52 @@ import tkinter as tk
 import json
 import ttkbootstrap as ttk
 from tkcalendar import DateEntry
-from tkinter import messagebox
+from tkinter import Tk, Text, messagebox
+import sqlite3
+
+
+
+def adicionar_contato():
+    global entry2, entry3, entry4, entry5, text_widget
+
+    nome = entry2.get()
+    sobrenome = entry3.get()
+    ddd = entry4.get()
+    numero = entry5.get()
+
+    if not nome or not sobrenome or not ddd or not numero:
+        messagebox.showerror("Erro", "Preencha todos os campos!")
+        return
+
+    try:
+        ddd = int(ddd)
+        numero = int(numero)
+    except ValueError:
+        messagebox.showerror("Erro", "DDD e Número devem ser números inteiros!")
+        return
+
+    if ddd <= 0 or ddd > 99:
+        messagebox.showerror("Erro", "DDD inválido")
+        return
+
+    if numero <= 0 or numero > 999999999:
+        messagebox.showerror("Erro", "Número inválido")
+        return
+
+    conexao = sqlite3.connect('meu_contato.db')
+
+    conexao.execute('''
+        INSERT INTO Contatos (nome, sobrenome, ddd, numero)
+        VALUES (?, ?, ?, ?)
+    ''', (nome, sobrenome, ddd, numero))
+
+    conexao.commit()
+    conexao.close()
+
+    atualizar_text_widget()
+
+    label = ttk.Label(aba2, text="Contato adicionado com sucesso! Vá para a aba de contatos para visualizar")
+    label.place(x=10, y=170)
 
 
 app = ttk.Window(themename="flatly")
@@ -17,6 +62,10 @@ aba2 = ttk.Frame(notebook)
 
 notebook.add(aba1, text="Contatos")
 notebook.add(aba2, text="Adicionar contatos")
+
+def atualizar_text_widget():
+    text_widget = Text(aba1, height=10, width=50)
+    text_widget.pack()
 
 def on_entry_click(event):
     if entry1.get() == 'Pesquisar contato':
@@ -139,7 +188,7 @@ entry5.bind('<FocusIn>', on_entry_click4)
 entry5.bind('<FocusOut>', on_focusout4)
 entry5.place(x= 30, y= 110)
 
-boot1 = ttk.Button(aba2, text="Adicionar", bootstyle="info")
+boot1 = ttk.Button(aba2, text="Adicionar", command= adicionar_contato, bootstyle="info")
 boot1.place(x= 30, y= 130)
 
 app.mainloop()
